@@ -29,8 +29,8 @@ func TestProductController(t *testing.T) {
 		res := httptest.NewRecorder()
 		r.ServeHTTP(res, req)
 
-		if res.Code != http.StatusCreated {
-			t.Fatalf("expected http status code of 201 but got: %+v, %+v", res.Code, res.Body.String())
+		if res.Code != http.StatusOK {
+			t.Fatalf("expected http status code of 200 but got: %+v, %+v", res.Code, res.Body.String())
 		}
 
 		body := make([]map[string]interface{}, 0, len(payloads.AvailablePackSizes))

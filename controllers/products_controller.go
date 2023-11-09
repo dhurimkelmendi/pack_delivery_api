@@ -62,5 +62,5 @@ func (c *ProductsController) CreateProductOrder(w http.ResponseWriter, r *http.R
 	}
 	defer r.Body.Close()
 
-	c.responder.JSON(w, r, createdProduct, http.StatusCreated)
+	c.responder.JSON(w, r, createdProduct, http.StatusOK)
 }
