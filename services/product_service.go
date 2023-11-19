@@ -26,6 +26,7 @@ func (s *ProductService) CreateProductOrder(ctx context.Context, createProduct *
 	createdPackOrders := make([]*payloads.CreatedPackOrderPayload, 0, len(payloads.AvailablePackSizes))
 	createdPackOrdersMap := map[int32]int{}
 	s.createPackOrdersMapFromProductAmount(createProduct.Amount, createdPackOrdersMap)
+	s.combineSmallPacksIntoLargerOnesWhereApplicable(createdPackOrdersMap)
 	for key, value := range createdPackOrdersMap {
 		if value == 0 {
 			continue
@@ -51,6 +52,31 @@ func (s *ProductService) createPackOrdersMapFromProductAmount(createProductAmoun
 		} else if i == 0 && createProductAmount <= packSize {
 			createdPackOrdersMap[packSize]++
 			return
+		}
+	}
+	return
+}
+
+func (s *ProductService) combineSmallPacksIntoLargerOnesWhereApplicable(createdPackOrdersMap map[int32]int) {
+	for i := len(payloads.AvailablePackSizes) - 1; i >= 0; i-- {
+		packSize := payloads.AvailablePackSizes[i]
+		amountOfPacks, _ := createdPackOrdersMap[packSize]
+		maxProductAmount := amountOfPacks * int(packSize)
+		if amountOfPacks == 0 {
+			continue
+		}
+		for j := i + 1; j <= len(payloads.AvailablePackSizes)-1; j++ {
+			largerPackSize := payloads.AvailablePackSizes[j]
+			remainder := maxProductAmount % int(largerPackSize)
+			if remainder >= 0 && remainder < maxProductAmount {
+				differenceInPackSizeForLargerPack := maxProductAmount / int(payloads.AvailablePackSizes[j])
+				createdPackOrdersMap[largerPackSize] += differenceInPackSizeForLargerPack
+				differenceInPackSizeForSmallerPack := differenceInPackSizeForLargerPack * (maxProductAmount / int(packSize))
+				createdPackOrdersMap[packSize] -= differenceInPackSizeForSmallerPack
+				if createdPackOrdersMap[packSize] == 0 {
+					delete(createdPackOrdersMap, packSize)
+				}
+			}
 		}
 	}
 	return
