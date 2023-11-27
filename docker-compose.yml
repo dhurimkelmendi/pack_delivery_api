@@ -1,19 +1,25 @@
 version: '3'
 services:
-  pack_delivery_api-postgres-server:
+  story-builder-postgres:
     image: 'postgres:latest'
+    restart: always
     ports:
       - '5432:5432'
     environment:
       POSTGRES_DB: pack_delivery_api_db
-      POSTGRES_USER: pack_delivery_api
+      POSTGRES_USER: pack_delivery_api_backend
       POSTGRES_PASSWORD: 'pack_delivery_api_password'
-  pack_delivery_api:
+  story-builder-api:
     build: .
     ports:
       - '8080:8080'
     volumes:
-      - '.:/go/src/github.com/dhurimkelmendi/pack_delivery_api'
+      - '.:/go/src/bitbucket.org/kinzoo-team/story-builder-api'
     environment:
       API_ORIGIN: 'http://localhost:8080'
-      ENV: development
+      DB_ADDR: story-builder-postgres
+      DB_PORT: 5432
+      DB_NAME: pack_delivery_api_db
+      DB_USERNAME: pack_delivery_api_backend
+      DB_PASSWORD: 'pack_delivery_api_password'
+      HTTP_ADDR: ':8080'

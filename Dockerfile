@@ -2,28 +2,21 @@
 
 FROM golang:1.18
 
-# Set destination for COPY
-WORKDIR /app
+RUN apk --update upgrade
+RUN apk add bash wget git
+RUN apk add build-base gcc
+RUN apk add postgresql-client
 
-COPY . ./
+# Source volumes ==================================================================================
+RUN rm -fr /go/src/github.com/dhurimkelmendi/pack_delivery_api-api
+RUN mkdir -p /go/src/github.com/dhurimkelmendi/pack_delivery_api-api
+VOLUME /go/src/github.com/dhurimkelmendi/pack_delivery_api-api
 
-RUN go mod download
+# Copy entry/support files ========================================================================
+COPY .circleci/docker/entry.sh /entry.sh
+RUN chmod +x /entry.sh
 
+# Cleanup =========================================================================================
+RUN rm -rf /var/cache/apk/*
 
-# Build
-RUN CGO_ENABLED=0 GOOS=linux go build -o /pack_delivery_api
-
-# Optional:
-# To bind to a TCP port, runtime parameters must be supplied to the docker command.
-# But we can document in the Dockerfile what ports
-# the application is going to listen on by default.
-# https://docs.docker.com/engine/reference/builder/#expose
-EXPOSE 8080
-
-FROM postgres
-ENV POSTGRES_PASSWORD pack_delivery_api_password
-ENV POSTGRES_DB pack_delivery_api_db
-COPY world.sql /docker-entrypoint-initdb.d/
-
-# Run
-CMD ["/pack_delivery_api"]
+ENTRYPOINT ["/entry.sh"]
