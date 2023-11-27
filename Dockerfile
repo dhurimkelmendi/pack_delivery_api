@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM golang:1.18
+FROM golang:1.18-alpine
 
 RUN apk --update upgrade
 RUN apk add bash wget git
