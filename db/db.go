@@ -48,11 +48,13 @@ func (d *Database) GetDB() *pg.DB {
 }
 func (d *Database) connect() {
 	d.db = pg.Connect(&pg.Options{
-		Addr:      d.config.DatabaseHost + ":" + d.config.DatabasePort,
-		Database:  d.config.DatabaseName,
-		User:      d.config.DatabaseUsername,
-		Password:  d.config.DatabasePassword,
-		TLSConfig: &tls.Config{},
+		Addr:     d.config.DatabaseHost + ":" + d.config.DatabasePort,
+		Database: d.config.DatabaseName,
+		User:     d.config.DatabaseUsername,
+		Password: d.config.DatabasePassword,
+		TLSConfig: &tls.Config{
+			InsecureSkipVerify: true,
+		},
 	})
 
 	if d.config.DebugDatabase {
