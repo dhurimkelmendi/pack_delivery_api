@@ -64,3 +64,27 @@ func (c *ProductsController) CreateProductOrder(w http.ResponseWriter, r *http.R
 
 	c.responder.JSON(w, r, createdProduct, http.StatusOK)
 }
+
+// ChangePackSizes changes the pack sizes
+func (c *ProductsController) ChangePackSizes(w http.ResponseWriter, r *http.Request) {
+	errCtx := c.errCmp(api.CtxCreateProduct, r.Header.Get("X-Request-Id"))
+	packSizes := &payloads.ChangePackSizesPayload{}
+	if err := json.NewDecoder(r.Body).Decode(packSizes); err != nil {
+		c.responder.Error(w, errCtx(api.ErrCreatePayload, errors.New("cannot decode packSizes")), http.StatusBadRequest)
+		return
+	}
+
+	if err := packSizes.Validate(); err != nil {
+		c.responder.Error(w, errCtx(api.ErrInvalidRequestPayload, errors.New("request body not valid, missing required fields")), http.StatusBadRequest)
+		return
+	}
+
+	createdPackSizes, err := c.productService.CreatePackSizes(context.Background(), packSizes)
+	if err != nil {
+		c.responder.Error(w, errCtx(api.ErrChangePackSizes, err), http.StatusBadRequest)
+		return
+	}
+	defer r.Body.Close()
+
+	c.responder.JSON(w, r, createdPackSizes, http.StatusOK)
+}

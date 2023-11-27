@@ -1,5 +1,13 @@
 version: '3'
 services:
+  pack_delivery_api-postgres-server:
+    image: 'postgres:latest'
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_DB: pack_delivery_api_db
+      POSTGRES_USER: pack_delivery_api
+      POSTGRES_PASSWORD: 'pack_delivery_api_password'
   pack_delivery_api:
     build: .
     ports:

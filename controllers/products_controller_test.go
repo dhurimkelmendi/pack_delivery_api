@@ -10,7 +10,6 @@ import (
 	"testing"
 
 	"github.com/dhurimkelmendi/pack_delivery_api/controllers"
-	"github.com/dhurimkelmendi/pack_delivery_api/payloads"
 	"github.com/go-chi/chi"
 )
 
@@ -33,7 +32,7 @@ func TestProductController(t *testing.T) {
 			t.Fatalf("expected http status code of 200 but got: %+v, %+v", res.Code, res.Body.String())
 		}
 
-		body := make([]map[string]interface{}, 0, len(payloads.AvailablePackSizes))
+		body := make([]map[string]interface{}, 0, 5)
 		dec := json.NewDecoder(strings.NewReader(res.Body.String()))
 		err := dec.Decode(&body)
 		if err != nil {
@@ -44,9 +43,25 @@ func TestProductController(t *testing.T) {
 		if int32(1) != int32(amountOfPacks) {
 			t.Fatalf("expected amount_of_packs to be 1, got: %+v", amountOfPacks)
 		}
-		packSize := body[0]["pack_size"].(float64)
-		if int32(payloads.AvailablePackSizes[0]) != int32(packSize) {
-			t.Fatalf("expected pack_size to be %d, got: %+v", payloads.AvailablePackSizes[0], packSize)
+	})
+	t.Run("change pack sizes", func(t *testing.T) {
+		r := chi.NewRouter()
+		r.Post("/api/v1/pack_sizes", ctrl.Products.ChangePackSizes)
+		bBuf := bytes.NewBuffer([]byte(`{"sizes": [23,31,53]}`))
+		req := httptest.NewRequest(http.MethodPost, "/api/v1/pack_sizes", bBuf)
+
+		res := httptest.NewRecorder()
+		r.ServeHTTP(res, req)
+
+		if res.Code != http.StatusOK {
+			t.Fatalf("expected http status code of 200 but got: %+v, %+v", res.Code, res.Body.String())
+		}
+
+		body := make([]map[string]interface{}, 0, 5)
+		dec := json.NewDecoder(strings.NewReader(res.Body.String()))
+		err := dec.Decode(&body)
+		if err != nil {
+			t.Fatalf("error decoding response body: %+v", err)
 		}
 	})
 }

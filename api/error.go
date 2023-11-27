@@ -42,4 +42,5 @@ var (
 	ErrCreatePayload           = NewResponseError("errCreatePayload", "unable to generate response payload")
 
 	ErrCreateProductOrder = NewResponseError("errCreateProductOrder", "unable to create product order")
+	ErrChangePackSizes    = NewResponseError("errChangePackSizes", "unable to change pack sizes")
 )

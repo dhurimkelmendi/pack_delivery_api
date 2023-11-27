@@ -13,7 +13,8 @@ const (
 
 // Product error contexts
 const (
-	CtxCreateProduct ErrorContext = "ctxCreateProduct"
+	CtxCreateProduct   ErrorContext = "ctxCreateProduct"
+	CtxChangePackSizes ErrorContext = "ctxChangePackSizes"
 )
 
 // Serializer error contexts

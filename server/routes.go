@@ -96,6 +96,7 @@ func Routes() http.Handler {
 	// Public routes
 	r.Route("/api/v1", func(r chi.Router) {
 		r.Post("/products", ctrl.Products.CreateProductOrder)
+		r.Post("/pack_sizes", ctrl.Products.ChangePackSizes)
 	})
 	return r
 }

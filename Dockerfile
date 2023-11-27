@@ -20,5 +20,10 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o /pack_delivery_api
 # https://docs.docker.com/engine/reference/builder/#expose
 EXPOSE 8080
 
+FROM postgres
+ENV POSTGRES_PASSWORD pack_delivery_api_password
+ENV POSTGRES_DB pack_delivery_api_db
+COPY world.sql /docker-entrypoint-initdb.d/
+
 # Run
 CMD ["/pack_delivery_api"]

@@ -2,13 +2,13 @@
 serve: main.go
 	go run main.go
 
-db_upgrade: main.go
+migrate: main.go
 	go run main.go migrate up
 
-db_reset: main.go
+reset: main.go
 	go run main.go migrate reset
 
-db_downgrade: main.go
+downgrade: main.go
 	go run main.go migrate down
 
 test:
