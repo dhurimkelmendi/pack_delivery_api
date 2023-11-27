@@ -1,6 +1,7 @@
 package db
 
 import (
+	"crypto/tls"
 	"fmt"
 
 	"github.com/dhurimkelmendi/pack_delivery_api/config"
@@ -47,10 +48,11 @@ func (d *Database) GetDB() *pg.DB {
 }
 func (d *Database) connect() {
 	d.db = pg.Connect(&pg.Options{
-		Addr:     d.config.DatabaseHost + ":" + d.config.DatabasePort,
-		Database: d.config.DatabaseName,
-		User:     d.config.DatabaseUsername,
-		Password: d.config.DatabasePassword,
+		Addr:      d.config.DatabaseHost + ":" + d.config.DatabasePort,
+		Database:  d.config.DatabaseName,
+		User:      d.config.DatabaseUsername,
+		Password:  d.config.DatabasePassword,
+		TLSConfig: &tls.Config{},
 	})
 
 	if d.config.DebugDatabase {
