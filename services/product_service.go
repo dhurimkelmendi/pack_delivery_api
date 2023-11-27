@@ -8,6 +8,7 @@ import (
 	"github.com/dhurimkelmendi/pack_delivery_api/models"
 	"github.com/dhurimkelmendi/pack_delivery_api/payloads"
 	"github.com/go-pg/pg/v10"
+	"github.com/sirupsen/logrus"
 )
 
 // ProductService is a struct that contains references to the dependencies
@@ -52,11 +53,13 @@ func (s *ProductService) createPackSizes(dbSession *pg.Tx, createPackSizes *payl
 
 	_, err := dbSession.Model(&models.PackSize{}).Where("?", true).Delete()
 	if err != nil {
+		logrus.Error(err)
 		return packSizes, err
 	}
 
 	_, err = dbSession.Model(&packSizes).Insert()
 	if err != nil {
+		logrus.Error(err)
 		return packSizes, err
 	}
 	return packSizes, nil
@@ -67,6 +70,7 @@ func (s *ProductService) CreateProductOrder(ctx context.Context, createProduct *
 	availablePackSizesFromDB := make([]*models.PackSize, 0)
 	err := s.db.Model(&availablePackSizesFromDB).Select()
 	if err != nil {
+		logrus.Error(err)
 		return nil, err
 	}
 	if len(availablePackSizesFromDB) == 0 {
