@@ -107,7 +107,10 @@ func (s *ProductService) createPackOrdersMapFromProductAmount(createProductAmoun
 		if createProductAmount >= packSize {
 			amountOfPacks, _ := createdPackOrdersMap[packSize]
 			createdPackOrdersMap[packSize] = amountOfPacks + 1
-			s.createPackOrdersMapFromProductAmount(createProductAmount-packSize, availablePackSizes, createdPackOrdersMap)
+			remainingProductAmount := createProductAmount - packSize
+			if remainingProductAmount > 0 {
+				s.createPackOrdersMapFromProductAmount(remainingProductAmount, availablePackSizes, createdPackOrdersMap)
+			}
 			return
 		} else if i == 0 && createProductAmount <= packSize {
 			createdPackOrdersMap[packSize]++

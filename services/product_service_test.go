@@ -46,6 +46,20 @@ func TestProductService(t *testing.T) {
 				t.Fatalf("create product order failed to produce expected result. \n received: %v", createdProductOrder)
 			}
 		})
+		t.Run("create product order with amount 250", func(t *testing.T) {
+			expectedResult := make([]*payloads.CreatedPackOrderPayload, 0, 1)
+			expectedResult = append(expectedResult, &payloads.CreatedPackOrderPayload{AmountOfPacks: 1, PackSize: 250})
+
+			productOrderToCreate := &payloads.CreateProductOrderPayload{}
+			productOrderToCreate.Amount = 250
+			createdProductOrder, err := service.CreateProductOrder(ctx, productOrderToCreate)
+			if err != nil {
+				t.Fatalf("error while creating product %+v", err)
+			}
+			if !reflect.DeepEqual(expectedResult, createdProductOrder) {
+				t.Fatalf("create product order failed to produce expected result. \n received: %v", createdProductOrder)
+			}
+		})
 		t.Run("create product order with amount 251", func(t *testing.T) {
 
 			expectedResult := make([]*payloads.CreatedPackOrderPayload, 0, 1)
@@ -84,6 +98,21 @@ func TestProductService(t *testing.T) {
 
 			productOrderToCreate := &payloads.CreateProductOrderPayload{}
 			productOrderToCreate.Amount = 751
+			createdProductOrder, err := service.CreateProductOrder(ctx, productOrderToCreate)
+			if err != nil {
+				t.Fatalf("error while creating product %+v", err)
+			}
+			if !reflect.DeepEqual(expectedResult, createdProductOrder) {
+				t.Fatalf("create product order failed to produce expected result. \n received: %v", createdProductOrder)
+			}
+		})
+		t.Run("create product order with amount 1000", func(t *testing.T) {
+
+			expectedResult := make([]*payloads.CreatedPackOrderPayload, 0, 1)
+			expectedResult = append(expectedResult, &payloads.CreatedPackOrderPayload{AmountOfPacks: 2, PackSize: 500})
+
+			productOrderToCreate := &payloads.CreateProductOrderPayload{}
+			productOrderToCreate.Amount = 1000
 			createdProductOrder, err := service.CreateProductOrder(ctx, productOrderToCreate)
 			if err != nil {
 				t.Fatalf("error while creating product %+v", err)
