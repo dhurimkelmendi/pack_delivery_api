@@ -125,9 +125,9 @@ func TestProductService(t *testing.T) {
 
 			expectedResult := make([]*payloads.CreatedPackOrderPayload, 0, 1)
 
-			expectedResult = append(expectedResult, &payloads.CreatedPackOrderPayload{AmountOfPacks: 2, PackSize: 5000})
-			expectedResult = append(expectedResult, &payloads.CreatedPackOrderPayload{AmountOfPacks: 1, PackSize: 2000})
 			expectedResult = append(expectedResult, &payloads.CreatedPackOrderPayload{AmountOfPacks: 1, PackSize: 250})
+			expectedResult = append(expectedResult, &payloads.CreatedPackOrderPayload{AmountOfPacks: 1, PackSize: 2000})
+			expectedResult = append(expectedResult, &payloads.CreatedPackOrderPayload{AmountOfPacks: 2, PackSize: 5000})
 
 			productOrderToCreate := &payloads.CreateProductOrderPayload{}
 			productOrderToCreate.Amount = 12001
@@ -151,11 +151,30 @@ func TestProductService(t *testing.T) {
 		if err != nil {
 			t.Fatalf("failed to insert pack_sizes: %v", err)
 		}
+		t.Run("create product order with amount 263", func(t *testing.T) {
+
+			expectedResult := make([]*payloads.CreatedPackOrderPayload, 0, 1)
+
+			expectedResult = append(expectedResult, &payloads.CreatedPackOrderPayload{AmountOfPacks: 2, PackSize: 23})
+			expectedResult = append(expectedResult, &payloads.CreatedPackOrderPayload{AmountOfPacks: 7, PackSize: 31})
+
+			productOrderToCreate := &payloads.CreateProductOrderPayload{}
+			productOrderToCreate.Amount = 263
+			createdProductOrder, err := service.CreateProductOrder(ctx, productOrderToCreate)
+			if err != nil {
+				t.Fatalf("error while creating product %+v", err)
+			}
+			if !reflect.DeepEqual(expectedResult, createdProductOrder) {
+				t.Fatalf("create product order failed to produce expected result. \n received: %v", createdProductOrder)
+			}
+		})
 		t.Run("create product order with amount 500k", func(t *testing.T) {
 
 			expectedResult := make([]*payloads.CreatedPackOrderPayload, 0, 1)
 
-			expectedResult = append(expectedResult, &payloads.CreatedPackOrderPayload{AmountOfPacks: 9434, PackSize: 53})
+			expectedResult = append(expectedResult, &payloads.CreatedPackOrderPayload{AmountOfPacks: 2, PackSize: 23})
+			expectedResult = append(expectedResult, &payloads.CreatedPackOrderPayload{AmountOfPacks: 7, PackSize: 31})
+			expectedResult = append(expectedResult, &payloads.CreatedPackOrderPayload{AmountOfPacks: 9429, PackSize: 53})
 
 			productOrderToCreate := &payloads.CreateProductOrderPayload{}
 			productOrderToCreate.Amount = 500000

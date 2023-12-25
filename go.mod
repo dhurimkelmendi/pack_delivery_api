@@ -10,7 +10,7 @@ require (
 )
 
 require (
-	github.com/go-pg/migrations/v8 v8.1.0 // indirect
+	github.com/go-pg/migrations/v8 v8.1.0
 	github.com/go-pg/zerochecker v0.2.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/tmthrgd/go-hex v0.0.0-20190904060850-447a3041c3bc // indirect

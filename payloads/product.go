@@ -55,6 +55,7 @@ type ChangePackSizesPayload struct {
 	Sizes []int `json:"sizes"`
 }
 
+// ToPackSizesModelArray maps the model into the corresponding payload
 func (a *ChangePackSizesPayload) ToPackSizesModelArray() []*models.PackSize {
 	packSizesModelArray := make([]*models.PackSize, 0, len(a.Sizes))
 	for _, packSize := range a.Sizes {

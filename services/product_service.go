@@ -2,7 +2,6 @@ package services
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/dhurimkelmendi/pack_delivery_api/db"
 	"github.com/dhurimkelmendi/pack_delivery_api/models"
@@ -80,10 +79,11 @@ func (s *ProductService) CreateProductOrder(ctx context.Context, createProduct *
 	for _, packSize := range availablePackSizesFromDB {
 		availablePackSizes = append(availablePackSizes, packSize.Size)
 	}
+	packSplitter := NewPackSplitter(availablePackSizes, createProduct.Amount)
+	createdPackOrdersMap := packSplitter.SplitOrderIntoPacks()
+
 	createdPackOrders := make([]*payloads.CreatedPackOrderPayload, 0, len(availablePackSizes))
-	createdPackOrdersMap := map[int]int{}
-	s.createPackOrdersMapFromProductAmount(createProduct.Amount, availablePackSizes, createdPackOrdersMap)
-	s.combineSmallPacksIntoLargerOnesWhereApplicable(availablePackSizes, createdPackOrdersMap)
+
 	for key, value := range createdPackOrdersMap {
 		if value == 0 {
 			continue
@@ -95,75 +95,4 @@ func (s *ProductService) CreateProductOrder(ctx context.Context, createProduct *
 		createdPackOrders = append(createdPackOrders, createdPackOrderForSize)
 	}
 	return createdPackOrders, nil
-}
-
-// recursive method that generates a map of packSizes used and amount of packs for each size
-func (s *ProductService) createPackOrdersMapFromProductAmount(createProductAmount int, availablePackSizes []int, createdPackOrdersMap map[int]int) {
-	for i := len(availablePackSizes) - 1; i >= 0; i-- {
-		packSize := availablePackSizes[i]
-		if packSize == 53 && createProductAmount == 51 {
-			fmt.Print("OK")
-		}
-		if createProductAmount >= packSize {
-			amountOfPacks, _ := createdPackOrdersMap[packSize]
-			createdPackOrdersMap[packSize] = amountOfPacks + 1
-			remainingProductAmount := createProductAmount - packSize
-			if remainingProductAmount > 0 {
-				s.createPackOrdersMapFromProductAmount(remainingProductAmount, availablePackSizes, createdPackOrdersMap)
-			}
-			return
-		} else if i == 0 && createProductAmount <= packSize {
-			createdPackOrdersMap[packSize]++
-			return
-		}
-	}
-	return
-}
-
-func (s *ProductService) combineSmallPacksIntoLargerOnesWhereApplicable(availablePackSizes []int, createdPackOrdersMap map[int]int) {
-	for i := len(availablePackSizes) - 1; i >= 0; i-- {
-		packSize := availablePackSizes[i]
-		amountOfPacks, _ := createdPackOrdersMap[packSize]
-		maxProductAmount := amountOfPacks * int(packSize)
-		if amountOfPacks == 0 {
-			continue
-		}
-		sumOfSmallerPackSizes := 0
-		proportionsOfSmallerPackSizesToLargerPackSize := map[int]float64{}
-		for j := 0; j < i; j++ {
-			smallerPackSize := availablePackSizes[j]
-			sumOfSmallerPackSizes += smallerPackSize
-			proportionsOfSmallerPackSizesToLargerPackSize[smallerPackSize] = float64(smallerPackSize) / float64(packSize)
-		}
-
-		portionsOfLargerSizePacksWithAmountsOfPacks := map[float64]int{}
-		if sumOfSmallerPackSizes >= packSize {
-			for j := 0; j < i; j++ {
-				smallerPackSize := availablePackSizes[j]
-				proportionForSmallerPackSize := proportionsOfSmallerPackSizesToLargerPackSize[smallerPackSize]
-				portionsOfLargerSizePacksWithAmountsOfPacks[proportionForSmallerPackSize*float64(createdPackOrdersMap[smallerPackSize])] = createdPackOrdersMap[smallerPackSize]
-				delete(createdPackOrdersMap, smallerPackSize)
-			}
-			sumOfPortionedPacks := float64(0)
-			for portion, amountOfPacks := range portionsOfLargerSizePacksWithAmountsOfPacks {
-				sumOfPortionedPacks += portion * float64(amountOfPacks)
-			}
-			createdPackOrdersMap[packSize] += int(sumOfPortionedPacks)
-		}
-
-		for j := i + 1; j <= len(availablePackSizes)-1; j++ {
-			largerPackSize := availablePackSizes[j]
-			remainder := maxProductAmount % int(largerPackSize)
-			if remainder >= 0 && remainder < maxProductAmount {
-				differenceInPackSizeForLargerPack := maxProductAmount / int(availablePackSizes[j])
-				createdPackOrdersMap[largerPackSize] += differenceInPackSizeForLargerPack
-				differenceInPackSizeForSmallerPack := differenceInPackSizeForLargerPack * (maxProductAmount / int(packSize))
-				createdPackOrdersMap[packSize] -= differenceInPackSizeForSmallerPack
-				if createdPackOrdersMap[packSize] == 0 {
-					delete(createdPackOrdersMap, packSize)
-				}
-			}
-		}
-	}
-	return
 }
