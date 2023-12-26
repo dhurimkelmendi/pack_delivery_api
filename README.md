@@ -14,6 +14,9 @@ To be able to use postgres locally without SSL, comment the following lines of c
 ```
 This disables ssl connection with the postgres instance locally. It is used in the deployed version of the app to ensure communication with the DB is encrypted.
 
+## Exploring the API
+To take a look at the API structure and try out endpoints, go to http://localhost:8080/api/v1/swagger/index.html
+
 There are two options to run the API:
 ### Using go cli commands
 1. Make sure you have Postgres running
