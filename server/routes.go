@@ -7,11 +7,13 @@ import (
 
 	"github.com/dhurimkelmendi/pack_delivery_api/config"
 	"github.com/dhurimkelmendi/pack_delivery_api/controllers"
+	_ "github.com/dhurimkelmendi/pack_delivery_api/docs"
 	"github.com/dhurimkelmendi/pack_delivery_api/internal/trace"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/cors"
 	"github.com/segmentio/ksuid"
 	"github.com/sirupsen/logrus"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 func logRequest(h http.Handler) http.Handler {
@@ -86,8 +88,14 @@ func getCORSHandler() func(http.Handler) http.Handler {
 	}).Handler
 }
 
+//	@title			Pack Delivery API
+//	@version		1.0
+//	@description	pack delivery API
+//	@BasePath		/
+
 // Routes returns the registered HTTP endpoints for the web application.
 func Routes() http.Handler {
+
 	r := chi.NewRouter()
 	r.Use(getCORSHandler())
 	r.Use(logRequest)
@@ -95,6 +103,7 @@ func Routes() http.Handler {
 
 	// Public routes
 	r.Route("/api/v1", func(r chi.Router) {
+		r.Mount("/swagger", httpSwagger.WrapHandler)
 		r.Post("/pack_sizes", ctrl.Products.ChangePackSizes)
 		r.Post("/products", ctrl.Products.CreateProductOrder)
 	})

@@ -41,6 +41,20 @@ func NewProductController(productService *services.ProductService) *ProductsCont
 	}
 }
 
+// CreateProductOrder godoc
+//
+//	@Summary		Creates a product order
+//	@Description	Creates a product order split in packs given a product amount
+//	@Tags			ProductOrder
+//	@Produce		json
+//	@Accept			json
+//	@Param			_			body		CreateProductOrderPayload	true	"Request JSON payload"
+//	@Success		200			{object}	CreatePackOrderPayload		"OK"
+//	@Failure		400			{object}	APIError					"Bad Request"
+//	@Failure		404			{object}	APIError					"Not Found"
+//	@Failure		500			{object}	APIError					"Server Error"
+//	@Router			/products 	[post]
+
 // CreateProductOrder creates a new product and returns product details with an authentication token
 func (c *ProductsController) CreateProductOrder(w http.ResponseWriter, r *http.Request) {
 	errCtx := c.errCmp(api.CtxCreateProduct, r.Header.Get("X-Request-Id"))
@@ -64,6 +78,20 @@ func (c *ProductsController) CreateProductOrder(w http.ResponseWriter, r *http.R
 
 	c.responder.JSON(w, r, createdProduct, http.StatusOK)
 }
+
+// ChangePackSizes godoc
+//
+//	@Summary		Changes the pack sizes
+//	@Description	Changes the pack sizes to the ones given as params
+//	@Tags			PackSizes
+//	@Produce		json
+//	@Accept			json
+//	@Param			_			body		ChangePackSizesPayload	true	"Request JSON payload"
+//	@Success		200			{object}	[]*models.PackSize		"OK"
+//	@Failure		400			{object}	APIError				"Bad Request"
+//	@Failure		404			{object}	APIError				"Not Found"
+//	@Failure		500			{object}	APIError				"Server Error"
+//	@Router			/products 	[post]
 
 // ChangePackSizes changes the pack sizes
 func (c *ProductsController) ChangePackSizes(w http.ResponseWriter, r *http.Request) {
